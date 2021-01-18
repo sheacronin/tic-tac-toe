@@ -1,6 +1,26 @@
 body {
-    text-align: center;
+    margin: 0 auto;
     background-color: #C8E0F4;
     color: #031927;
     font-family: Arial, Helvetica, sans-serif;
+    text-align: center;
+}
+
+#game-board {
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+    align-items: stretch;
+    width: 500px;
+    height: 500px;
+    background-color: #9DD1F1;
+    font-size: 60px;
+}
+
+#game-board div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid black;
 }
