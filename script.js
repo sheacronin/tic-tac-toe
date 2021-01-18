@@ -1,11 +1,15 @@
 const gameBoard = (() => {
     const gameBoardEl = document.querySelector('#game-board');
-    const array = ['X', 'X', 'O',
-                   'O', 'O', 'X',
-                   'X', 'X', 'O'];
+    const array = ['', '', '',
+                   '', '', '',
+                   '', '', ''];
 
     const displayMark = (event) => {
-        console.log('You clicked ' + event.target);
+        if (score.xsTurn) {
+            playerX.markSpot(event.target);
+        } else {
+            playerO.markSpot(event.target);
+        }
     }
 
     const render = () => {
@@ -22,24 +26,38 @@ const gameBoard = (() => {
     }
 
     return {
+        array,
         render
     }
 })();
 
+const score = (() => {
+    // Init turn value so x starts.
+    const xsTurn = true;
+
+    return {
+        xsTurn,
+    }
+})();
+
 const Player = (value) => {
-    const markSpot = event => {
-        const spot = event.target;
+    const endTurn = () => {
+        score.xsTurn = !score.xsTurn;
+    }
+    const markSpot = spot => {
         if (spot.textContent === '') {
             // Change value in array.
             gameBoard.array[spot.dataset.index] = value;
-            // Change value in DOM.
+            // Change value in DOM. !! MOVE THIS TO GAMEBOARD MODULE !?
             spot.textContent = value;
+
+            endTurn();
         } else {
             alert('This spot is taken');
         }
     }
 
-    return {markSpot}
+    return {markSpot, endTurn}
 }
 
 gameBoard.render();
