@@ -33,10 +33,54 @@ const gameBoard = (() => {
 
 const game = (() => {
     // Init turn value so x starts.
-    const xsTurn = true;
+    let xsTurn = true;
+    const checkIfWinner = (value) => {
+        console.log('Checking if ' + value + ' is a winner...');
+        const winningConditions = [
+            [0, 1, 2],
+            [3, 4, 5],
+            [6, 7, 8],
+
+            [0, 3, 6],
+            [1, 4, 7],
+            [2, 5, 8],
+
+            [0, 4, 8],
+            [2, 4, 6]
+        ];
+
+        winningConditions.forEach(line => {
+            for (let i = 0; i < line.length; i++) {
+                if (gameBoard.array[line[i]] === value) {
+                    if (i === 2) { // All three indexes match.
+                        console.log(value + ' wins!');
+                        return;
+                    }
+                    continue;
+                } else {
+                    break;
+                }
+                // if (gameBoard.array[line[i]] !== value) {
+                //     break;
+                // } 
+                // i++;
+                // if (gameBoard.array[line[i]] !== value) {
+                //     break;
+                // } 
+                // i++;
+                // if (gameBoard.array[line[i]] !== value) {
+                //     break;
+                // } 
+                // console.log(value + ' wins!');
+            }
+        });
+
+        console.log('No winner yet.');
+    }
 
     return {
         xsTurn,
+        checkIfWinner
     }
 })();
 
@@ -52,7 +96,7 @@ const messages = (() => {
 })();
 
 const Player = (value) => {
-    const endTurn = () => {
+    const _endTurn = () => {
         game.xsTurn = !game.xsTurn;
         messages.displayTurn();
     }
@@ -63,13 +107,14 @@ const Player = (value) => {
             // Change value in DOM.
             spot.textContent = value;
 
-            endTurn();
+            game.checkIfWinner(value);
+            _endTurn();
         } else {
             alert('This spot is taken');
         }
     }
 
-    return {markSpot, endTurn}
+    return {value, markSpot}
 }
 
 gameBoard.render();
