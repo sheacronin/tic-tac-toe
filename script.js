@@ -1,14 +1,23 @@
 const gameBoard = (() => {
     const gameBoardEl = document.querySelector('#game-board');
-    const gameBoardArray = ['X', 'X', 'O',
-                            'O', 'O', 'X',
-                            'X', 'X', 'O'];
+    const array = ['X', 'X', 'O',
+                   'O', 'O', 'X',
+                   'X', 'X', 'O'];
+
+    const displayMark = (event) => {
+        console.log('You clicked ' + event.target);
+    }
 
     const render = () => {
-        gameBoardArray.forEach(value => {
-            const valueEl = document.createElement('div');
-            valueEl.textContent = value;
-            gameBoardEl.appendChild(valueEl);
+        let i = 0;
+        array.forEach(value => {
+            const spot = document.createElement('div');
+            spot.textContent = value;
+            spot.dataset.index = i;
+            spot.addEventListener('click', displayMark);
+            gameBoardEl.appendChild(spot);
+
+            i++;
         });
     }
 
@@ -18,8 +27,12 @@ const gameBoard = (() => {
 })();
 
 const Player = (value) => {
-    const markSpot = spot => {
+    const markSpot = event => {
+        const spot = event.target;
         if (spot.textContent === '') {
+            // Change value in array.
+            gameBoard.array[spot.dataset.index] = value;
+            // Change value in DOM.
             spot.textContent = value;
         } else {
             alert('This spot is taken');
@@ -30,3 +43,6 @@ const Player = (value) => {
 }
 
 gameBoard.render();
+
+const playerX = Player('X');
+const playerO = Player('O');
