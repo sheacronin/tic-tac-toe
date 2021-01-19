@@ -49,33 +49,38 @@ const game = (() => {
             [2, 4, 6]
         ];
 
-        winningConditions.forEach(line => {
-            for (let i = 0; i < line.length; i++) {
-                if (gameBoard.array[line[i]] === value) {
-                    if (i === 2) { // All three indexes match.
+        for (let i = 0; i < winningConditions.length; i++) {
+            const line = winningConditions[i]; 
+            for (let j = 0; j < line.length; j++) {
+                if (gameBoard.array[line[j]] === value) {
+                    if (j === 2) { // All three indexes match.
                         console.log(value + ' wins!');
-                        return;
+                        endGame(value);
+                        return true;
                     }
                     continue;
                 } else {
                     break;
                 }
-                // if (gameBoard.array[line[i]] !== value) {
-                //     break;
-                // } 
-                // i++;
-                // if (gameBoard.array[line[i]] !== value) {
-                //     break;
-                // } 
-                // i++;
-                // if (gameBoard.array[line[i]] !== value) {
-                //     break;
-                // } 
-                // console.log(value + ' wins!');
             }
-        });
+        }
 
-        console.log('No winner yet.');
+        checkIfTie();
+        console.log('No winner.');
+    }
+
+    const checkIfTie = () => {
+        for (let i = 0; i < gameBoard.array.length; i++) {
+            if (gameBoard.array[i] === '') {
+                return false;
+            }
+        }
+        // If loops through all values and none are left empty:
+        endGame('tie');
+    }
+
+    const endGame = (result) => {
+        messages.declareWinner(result);
     }
 
     return {
@@ -89,9 +94,17 @@ const messages = (() => {
     const displayTurn = () => {
         gameMessage.textContent = game.xsTurn ? 'X\'s turn' : 'O\'s turn';
     }
+    const declareWinner = (winner) => {
+        if (winner === 'tie') {
+            gameMessage.textContent = 'It\'s a tie.';
+        } else {
+            gameMessage.textContent = winner + ' wins!';
+        }
+    }
 
     return {
-        displayTurn
+        displayTurn,
+        declareWinner
     }
 })();
 
@@ -99,6 +112,8 @@ const Player = (value) => {
     const _endTurn = () => {
         game.xsTurn = !game.xsTurn;
         messages.displayTurn();
+
+        game.checkIfWinner(value);
     }
     const markSpot = spot => {
         if (spot.textContent === '') {
@@ -107,7 +122,6 @@ const Player = (value) => {
             // Change value in DOM.
             spot.textContent = value;
 
-            game.checkIfWinner(value);
             _endTurn();
         } else {
             alert('This spot is taken');
