@@ -35,9 +35,16 @@ const gameBoard = (() => {
         });
     }
 
+    const disableBoard = () => {
+        gameBoardEl.childNodes.forEach(spot => {
+            spot.removeEventListener('click', displayMark);
+        });
+    }
+
     return {
         array,
-        render
+        render,
+        disableBoard
     }
 })();
 
@@ -65,7 +72,7 @@ const game = (() => {
                 if (gameBoard.array[line[j]] === value) {
                     if (j === 2) { // All three indexes match.
                         console.log(value + ' wins!');
-                        endGame(value);
+                        _endGame(value);
                         return true;
                     }
                     continue;
@@ -86,11 +93,14 @@ const game = (() => {
             }
         }
         // If loops through all values and none are left empty:
-        endGame('tie');
+        _endGame('tie');
     }
 
-    const endGame = (result) => {
+    const _endGame = (result) => {
         messages.declareWinner(result);
+        // Disable board from being interacted with.
+        // Remove event listeners
+        gameBoard.disableBoard();
     }
 
     return {
