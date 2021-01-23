@@ -19,6 +19,16 @@ const gameBoard = (() => {
             spot.textContent = value;
             spot.dataset.index = i;
             spot.addEventListener('click', displayMark);
+
+            // Check which spot to add border styles.
+            if (i === 1 || i === 7) {
+                spot.classList.add('ver-middle-spot');
+            } else if (i === 4) {
+                spot.classList.add('middle-spot');
+            } else if (i === 3 || i === 5) {
+                spot.classList.add('hor-middle-spot');
+            }
+
             gameBoardEl.appendChild(spot);
 
             i++;

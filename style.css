@@ -16,7 +16,7 @@ body {
     width: 500px;
     height: 500px;
     background-color: #9DD1F1;
-    font-size: 60px;
+    font-size: 80px;
 }
 
 #game-message {
@@ -27,5 +27,18 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    border: 1px solid black;
+}
+
+.middle-spot {
+    border: 2px solid black;
+}
+
+.ver-middle-spot {
+    border-left: 2px solid black;
+    border-right: 2px solid black;
+}
+
+.hor-middle-spot {
+    border-top: 2px solid black;
+    border-bottom: 2px solid black;
 }
