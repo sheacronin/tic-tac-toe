@@ -8,9 +8,23 @@
 </head>
 <body>
     <h1>TIC TAC TOE</h1>
-    <div id="game-message">Begin the game! X goes first.</div>
+
+    <div id="game-message">Welcome! Please enter your names.</div>
     
-    <div id="game-board"></div>
+    <div id="game-setup">
+        <div id="x">
+            <label class="name-label" for="playerX">Who is X?</label>
+            <input class="name-input" type="text" name="playerX" id="playerX">
+            <button id="x-btn" class="name-btn">submit</button>
+        </div>
+        <div id="o">
+            <label class="name-label" for="playerO">Who is O?</label>
+            <input class="name-input" type="text" name="playerO" id="playerO">
+            <button id="o-btn" class="name-btn">submit</button>
+        </div>
+    </div>
+
+    <div id="game-board" style="display: none;"></div>
     
     <script src="script.js" type="text/javascript"></script>
 </body>
