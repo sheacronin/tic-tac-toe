@@ -1,3 +1,29 @@
+// Module to help all modules communicate.
+const events = {
+    events: {},
+    on: function(eventName, fn) {
+        this.events[eventName] = this.events[eventName] || [];
+        this.events[eventName].push(fn);
+    },
+    off: function(eventName, fn) {
+        if (this.events[eventName]) {
+            for (let i = 0; i < this.events[eventName].length; i++) {
+                if (this.events[eventName][i] === fn) {
+                    this.events[eventName].splice(i, 1);
+                    break;
+                }
+            }
+        }
+    },
+    emit: function(eventName, data){
+        console.log(eventName + ' was emitted');
+        if (this.events[eventName]) {
+            this.events[eventName].forEach(fn => fn(data));
+        }
+    }
+}
+
+// Module for the game board object.
 const gameBoard = (() => {
     const gameBoardEl = document.querySelector('#game-board');
     const array = ['', '', '',
@@ -5,7 +31,7 @@ const gameBoard = (() => {
                    '', '', ''];
 
     const displayMark = (event) => {
-        if (game.xsTurn) {
+        if (game.getWhoseTurn() === 'X') {
             playerX.markSpot(event.target);
         } else {
             playerO.markSpot(event.target);
@@ -18,6 +44,8 @@ const gameBoard = (() => {
             const spot = document.createElement('div');
             spot.textContent = value;
             spot.dataset.index = i;
+            // // Add listener to emit spotClicked event when spot is clicked.
+            // spot.addEventListener('click', e => events.emit('spotClicked', e.target));
             spot.addEventListener('click', displayMark);
 
             // Check which spot to add border styles.
@@ -39,6 +67,8 @@ const gameBoard = (() => {
         gameBoardEl.childNodes.forEach(spot => {
             spot.removeEventListener('click', displayMark);
         });
+
+        gameBoardEl.classList.add('game-over');
     }
 
     return {
@@ -48,9 +78,28 @@ const gameBoard = (() => {
     }
 })();
 
+// Module to control the flow of the game.
 const game = (() => {
     // Init turn value so x starts.
-    let xsTurn = true;
+    let whoseTurn = 'X';
+
+    const getWhoseTurn = () => {
+        return whoseTurn;
+    }
+
+    const switchTurn = () => {
+        console.log(whoseTurn + '\'s turn ended');
+        if (whoseTurn === 'X') {
+            whoseTurn = 'O';
+        } else {
+            whoseTurn = 'X';
+        }
+        console.log(whoseTurn + '\'s turn now');
+    }
+
+    // Bind to turnEnded event.
+    events.on('turnEnded', switchTurn);
+
     const checkIfWinner = (value) => {
         console.log('Checking if ' + value + ' is a winner...');
         const winningConditions = [
@@ -99,21 +148,26 @@ const game = (() => {
     const _endGame = (result) => {
         messages.declareWinner(result);
         // Disable board from being interacted with.
-        // Remove event listeners
         gameBoard.disableBoard();
+
+        messages.addRestartBtn();
+
     }
 
     return {
-        xsTurn,
-        checkIfWinner
+        checkIfWinner,
+        getWhoseTurn
     }
 })();
 
+// Module for the status messages above the game board.
 const messages = (() => {
     const gameMessage = document.querySelector('#game-message');
-    const displayTurn = () => {
-        gameMessage.textContent = game.xsTurn ? 'X\'s turn' : 'O\'s turn';
+
+    const displayTurn = (value) => {
+        gameMessage.textContent = value === 'X' ? 'O\'s turn' : 'X\'s turn';
     }
+
     const declareWinner = (winner) => {
         if (winner === 'tie') {
             gameMessage.textContent = 'It\'s a tie.';
@@ -121,37 +175,67 @@ const messages = (() => {
             gameMessage.textContent = winner + ' wins!';
         }
     }
+    // Bind displayTurn to turnEnded event.
+    events.on('turnEnded', displayTurn);
+
+    const addRestartBtn = () => {
+        const restartBtn = document.createElement('button');
+        restartBtn.textContent = 'RESTART';
+        gameMessage.appendChild(restartBtn);
+    }
 
     return {
         displayTurn,
-        declareWinner
+        declareWinner,
+        addRestartBtn
     }
 })();
 
+// Factory for Player objects.
 const Player = (value) => {
+    // let myTurn = value === 'X' ? true : false;
+
     const _endTurn = () => {
-        game.xsTurn = !game.xsTurn;
-        messages.displayTurn();
+        // Emit event to mediator.
+        events.emit('turnEnded', value);
+        // messages.displayTurn();
 
-        game.checkIfWinner(value);
+        // game.checkIfWinner(value);
     }
-    const markSpot = spot => {
-        if (spot.textContent === '') {
-            // Change value in array.
-            gameBoard.array[spot.dataset.index] = value;
-            // Change value in DOM.
-            spot.textContent = value;
 
-            _endTurn();
+    // const switchTurn = () => {
+    //     myTurn = !myTurn;
+    // }
+
+    // events.on('turnEnded', switchTurn);
+
+    const markSpot = spot => {
+        console.log(value + ' trying to mark...')
+        if (game.getWhoseTurn() === value) { // Check if it's your turn.
+              if (spot.textContent === '') {
+                // Change value in array.
+                gameBoard.array[spot.dataset.index] = value;
+                // Change value in DOM.
+                spot.textContent = value;
+
+                _endTurn();
+            } else {
+                alert('This spot is taken');
+            }
         } else {
-            alert('This spot is taken');
+            console.log('Not your turn, ' + value);
         }
     }
+
+    // // Bind to spotClicked event.
+    // events.on('spotClicked', markSpot);
 
     return {value, markSpot}
 }
 
+// Render game board on page load.
 gameBoard.render();
 
+// Create objects for each player.
 const playerX = Player('X');
 const playerO = Player('O');

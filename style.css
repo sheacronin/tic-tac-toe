@@ -19,6 +19,10 @@ body {
     font-size: 80px;
 }
 
+.game-over {
+    color: grey;
+}
+
 #game-message {
     margin-bottom: 20px;
 }
