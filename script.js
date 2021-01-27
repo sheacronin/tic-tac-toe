@@ -191,35 +191,8 @@ const messages = (() => {
     }
 })();
 
-// Module for setting up game.
-const config = (() => {
-    const xName = document.querySelector('#x-name');
-    const oName = document.querySelector('#o-name');
-    const xBtn = document.querySelector('#x-btn');
-    const oBtn = document.querySelector('#o-btn');
-
-    const disableInput = (e) => {
-        const inputEl = e.target.previousElementSibling;
-        inputEl.disabled = true;
-        const btnEl = e.target;
-        btnEl.disabled = true;
-    }
-
-    const showPlayerReady = (e) => {
-        const readyP = document.createElement('p');
-        readyP.textContent = 'Player ready!';
-        readyP.classList.add('player-ready');
-
-        const parentEl = e.target.parentElement;
-        parentEl.appendChild(readyP);
-    }
-
-    xBtn.addEventListener('click', disableInput);
-    xBtn.addEventListener('click', showPlayerReady);
-})();
-
 // Factory for Player objects.
-const Player = (value) => {
+const Player = (value, name) => {
     // let myTurn = value === 'X' ? true : false;
 
     const _endTurn = () => {
@@ -257,8 +230,47 @@ const Player = (value) => {
     // // Bind to spotClicked event.
     // events.on('spotClicked', markSpot);
 
-    return {value, markSpot}
+    return {value, name, markSpot}
 }
+
+// Module for setting up game.
+const config = (() => {
+    const disableInput = (e) => {
+        const inputEl = e.target.previousElementSibling;
+        inputEl.disabled = true;
+        const btnEl = e.target;
+        btnEl.disabled = true;
+    }
+
+    const showPlayerReady = (e) => {
+        const readyP = document.createElement('p');
+        readyP.textContent = 'Player ready!';
+        readyP.classList.add('player-ready');
+
+        const parentEl = e.target.parentElement;
+        parentEl.appendChild(readyP);
+    }
+
+    const createPlayer = (e) => {
+        const name = e.target.previousElementSibling.value;
+        // Parent div ID is the value we want.
+        const value =  e.target.parentElement.id.toUpperCase();
+        console.log(Player(value, name));
+    }
+
+    const nameBtns = document.querySelectorAll('.name-btn');
+    nameBtns.forEach(btn => {
+        btn.addEventListener('click', disableInput);
+        btn.addEventListener('click', showPlayerReady);
+        btn.addEventListener('click', createPlayer);
+    });
+
+    // if both name buttons are disabled
+    // then hide these inputs
+    // and show gameboard
+
+    // Return player X and Player O
+})();
 
 // Render game board on page load.
 gameBoard.render();
