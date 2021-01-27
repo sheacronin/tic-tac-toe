@@ -191,6 +191,33 @@ const messages = (() => {
     }
 })();
 
+// Module for setting up game.
+const config = (() => {
+    const xName = document.querySelector('#x-name');
+    const oName = document.querySelector('#o-name');
+    const xBtn = document.querySelector('#x-btn');
+    const oBtn = document.querySelector('#o-btn');
+
+    const disableInput = (e) => {
+        const inputEl = e.target.previousElementSibling;
+        inputEl.disabled = true;
+        const btnEl = e.target;
+        btnEl.disabled = true;
+    }
+
+    const showPlayerReady = (e) => {
+        const readyP = document.createElement('p');
+        readyP.textContent = 'Player ready!';
+        readyP.classList.add('player-ready');
+
+        const parentEl = e.target.parentElement;
+        parentEl.appendChild(readyP);
+    }
+
+    xBtn.addEventListener('click', disableInput);
+    xBtn.addEventListener('click', showPlayerReady);
+})();
+
 // Factory for Player objects.
 const Player = (value) => {
     // let myTurn = value === 'X' ? true : false;
