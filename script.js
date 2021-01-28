@@ -172,6 +172,7 @@ const messages = (() => {
     const gameMessage = document.querySelector('#game-message');
 
     const displayTurn = (value) => {
+        // Display name based on player value.
         gameMessage.textContent = value === 'X' ? 'O\'s turn' : 'X\'s turn';
     }
 
@@ -240,8 +241,14 @@ const Player = (value, name) => {
     return {value, name, markSpot}
 }
 
+// Set up Player variables to be defined in config.
+// This is not ideal!! Global variables.
+let playerX;
+let playerO;
+
 // Module for setting up game.
 const config = (() => {
+
     const disableInput = (e) => {
         const inputEl = e.target.previousElementSibling;
         inputEl.disabled = true;
@@ -262,12 +269,17 @@ const config = (() => {
         const name = e.target.previousElementSibling.value;
         // Grab dataset value attribute.
         const value =  e.target.dataset.value;
-        console.log(Player(value, name));
+
+        if (value === 'X') {
+            playerX = Player(value, name);
+        } else {
+            playerO = Player(value, name);
+        }
     }
 
     const nameBtns = document.querySelectorAll('.name-btn');
 
-    const checkIfBothReady = () => {
+    const switchToGameBoard = () => {
         // if both name buttons are disabled
         if (nameBtns[0].disabled && nameBtns[1].disabled) {
             console.log('both buttons disabled.');
@@ -283,15 +295,11 @@ const config = (() => {
         btn.addEventListener('click', disableInput);
         btn.addEventListener('click', showPlayerReady);
         btn.addEventListener('click', createPlayer);
-        btn.addEventListener('click', checkIfBothReady);
+        btn.addEventListener('click', switchToGameBoard);
     });
 
-    // Return player X and Player O
+    // Return player objects??
 })();
 
 // Render game board on page load.
 gameBoard.render();
-
-// Create objects for each player.
-const playerX = Player('X');
-const playerO = Player('O');
