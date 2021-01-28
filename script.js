@@ -26,6 +26,13 @@ const events = {
 // Module for the game board object.
 const gameBoard = (() => {
     const gameBoardEl = document.querySelector('#game-board');
+
+    const showGameBoard = () => {
+        gameBoardEl.style.removeProperty('display');
+    }
+
+    events.on('playersReady', showGameBoard);
+
     const array = ['', '', '',
                    '', '', '',
                    '', '', ''];
@@ -259,15 +266,25 @@ const config = (() => {
     }
 
     const nameBtns = document.querySelectorAll('.name-btn');
+
+    const checkIfBothReady = () => {
+        // if both name buttons are disabled
+        if (nameBtns[0].disabled && nameBtns[1].disabled) {
+            console.log('both buttons disabled.');
+            // then hide these inputs
+            const gameSetup = document.getElementById('game-setup');
+            gameSetup.style.display = 'none';
+            // and show gameboard
+            events.emit('playersReady');
+        }
+    }
+
     nameBtns.forEach(btn => {
         btn.addEventListener('click', disableInput);
         btn.addEventListener('click', showPlayerReady);
         btn.addEventListener('click', createPlayer);
+        btn.addEventListener('click', checkIfBothReady);
     });
-
-    // if both name buttons are disabled
-    // then hide these inputs
-    // and show gameboard
 
     // Return player X and Player O
 })();
