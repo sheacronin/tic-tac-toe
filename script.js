@@ -253,8 +253,8 @@ const config = (() => {
 
     const createPlayer = (e) => {
         const name = e.target.previousElementSibling.value;
-        // Parent div ID is the value we want.
-        const value =  e.target.parentElement.id.toUpperCase();
+        // Grab dataset value attribute.
+        const value =  e.target.dataset.value;
         console.log(Player(value, name));
     }
 
