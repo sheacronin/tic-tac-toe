@@ -38,11 +38,7 @@ const gameBoard = (() => {
                    '', '', ''];
 
     const displayMark = (event) => {
-        if (game.getWhoseTurn() === 'X') {
-            playerX.markSpot(event.target);
-        } else {
-            playerO.markSpot(event.target);
-        }
+        game.getWhoseTurn().markSpot(event.target);
     }
 
     const render = () => {
@@ -130,12 +126,6 @@ const Player = (value, name) => {
 
         // game.checkIfWinner(value);
     }
-
-    // const switchTurn = () => {
-    //     myTurn = !myTurn;
-    // }
-
-    // events.on('turnEnded', switchTurn);
 
     const markSpot = spot => {
         console.log(value + ' trying to mark...')
@@ -228,25 +218,28 @@ const config = (() => {
 
 // Module to control the flow of the game.
 const game = (() => {
-    // Init turn value so x starts.
-    let whoseTurn = 'X';
+    // Init whoseTurn variable.
+    let whoseTurn;
 
     const getWhoseTurn = () => {
         return whoseTurn;
     }
 
-    const switchTurn = () => {
-        console.log(whoseTurn + '\'s turn ended');
-        if (whoseTurn === 'X') {
-            whoseTurn = 'O';
-        } else {
-            whoseTurn = 'X';
+    // Function to change turn value at beginning of game
+    // and after the end of each turn.
+    const setWhoseTurn = () => {
+        if (whoseTurn === players[0]) { // If it was just player1's turn.
+            whoseTurn = players[1];
+        } else { // If it was player2's turn, OR if whoseTurn is empty (beginning of game).
+            whoseTurn = players[0];
         }
-        console.log(whoseTurn + '\'s turn now');
+        console.log(whoseTurn.name + '\'s turn now');
     }
 
     // Bind to turnEnded event.
-    events.on('turnEnded', switchTurn);
+    events.on('turnEnded', setWhoseTurn);
+    // Bind to playersReady event to set init turn to player1.
+    events.on('playersReady', setWhoseTurn);
 
     const checkIfWinner = (value) => {
         console.log('Checking if ' + value + ' is a winner...');
