@@ -85,6 +85,147 @@ const gameBoard = (() => {
     }
 })();
 
+// Module for the status messages above the game board.
+const messages = (() => {
+    const gameMessage = document.querySelector('#game-message');
+
+    const displayTurn = (value) => {
+        // Display name based on player value.
+        gameMessage.textContent = value === 'X' ? 'O\'s turn' : 'X\'s turn';
+    }
+
+    const declareWinner = (winner) => {
+        if (winner === 'tie') {
+            gameMessage.textContent = 'It\'s a tie.';
+        } else {
+            gameMessage.textContent = winner + ' wins!';
+        }
+    }
+    // Bind displayTurn to turnEnded event.
+    events.on('turnEnded', displayTurn);
+
+    const addRestartBtn = () => {
+        const restartBtn = document.createElement('button');
+        restartBtn.textContent = 'RESTART';
+        gameMessage.appendChild(restartBtn);
+    }
+
+    return {
+        displayTurn,
+        declareWinner,
+        addRestartBtn
+    }
+})();
+
+// Factory for Player objects.
+const Player = (value, name) => {
+    // let myTurn = value === 'X' ? true : false;
+
+    const _endTurn = () => {
+        // Emit event to mediator.
+        // turnEnded will trigger messages.displayTurn()
+        //                    and game.checkIfWinner()
+        events.emit('turnEnded', value);
+        // messages.displayTurn();
+
+        // game.checkIfWinner(value);
+    }
+
+    // const switchTurn = () => {
+    //     myTurn = !myTurn;
+    // }
+
+    // events.on('turnEnded', switchTurn);
+
+    const markSpot = spot => {
+        console.log(value + ' trying to mark...')
+        if (game.getWhoseTurn() === value) { // Check if it's your turn.
+              if (spot.textContent === '') {
+                // Change value in array.
+                gameBoard.array[spot.dataset.index] = value;
+                // Change value in DOM.
+                spot.textContent = value;
+
+                _endTurn();
+            } else {
+                alert('This spot is taken');
+            }
+        } else {
+            console.log('Not your turn, ' + value);
+        }
+    }
+
+    // // Bind to spotClicked event.
+    // events.on('spotClicked', markSpot);
+
+    return {value, name, markSpot}
+}
+
+// // Set up Player variables to be defined in config.
+// // This is not ideal!! Global variables.
+// let playerX;
+// let playerO;
+
+// Create an empty array to store the two players.
+const players = [];
+
+// Module for setting up game.
+const config = (() => {
+
+    const disableInput = (e) => {
+        const inputEl = e.target.previousElementSibling;
+        inputEl.disabled = true;
+        const btnEl = e.target;
+        btnEl.disabled = true;
+    }
+
+    const showPlayerReady = (e) => {
+        const readyP = document.createElement('p');
+        readyP.textContent = 'Player ready!';
+        readyP.classList.add('player-ready');
+
+        const parentEl = e.target.parentElement;
+        parentEl.appendChild(readyP);
+    }
+
+    const createPlayer = (e) => {
+        const name = e.target.previousElementSibling.value;
+        // Grab dataset value attribute.
+        const value =  e.target.dataset.value;
+
+        players.push(Player(value, name));
+
+        // if (value === 'X') {
+        //     playerX = Player(value, name);
+        // } else {
+        //     playerO = Player(value, name);
+        // }
+    }
+
+    const nameBtns = document.querySelectorAll('.name-btn');
+
+    const switchToGameBoard = () => {
+        // if both name buttons are disabled
+        if (nameBtns[0].disabled && nameBtns[1].disabled) {
+            console.log('both buttons disabled.');
+            // then hide these inputs
+            const gameSetup = document.getElementById('game-setup');
+            gameSetup.style.display = 'none';
+            // and show gameboard
+            events.emit('playersReady');
+        }
+    }
+
+    nameBtns.forEach(btn => {
+        btn.addEventListener('click', disableInput);
+        btn.addEventListener('click', showPlayerReady);
+        btn.addEventListener('click', createPlayer);
+        btn.addEventListener('click', switchToGameBoard);
+    });
+
+    // Return player objects??
+})();
+
 // Module to control the flow of the game.
 const game = (() => {
     // Init turn value so x starts.
@@ -165,140 +306,6 @@ const game = (() => {
         checkIfWinner,
         getWhoseTurn
     }
-})();
-
-// Module for the status messages above the game board.
-const messages = (() => {
-    const gameMessage = document.querySelector('#game-message');
-
-    const displayTurn = (value) => {
-        // Display name based on player value.
-        gameMessage.textContent = value === 'X' ? 'O\'s turn' : 'X\'s turn';
-    }
-
-    const declareWinner = (winner) => {
-        if (winner === 'tie') {
-            gameMessage.textContent = 'It\'s a tie.';
-        } else {
-            gameMessage.textContent = winner + ' wins!';
-        }
-    }
-    // Bind displayTurn to turnEnded event.
-    events.on('turnEnded', displayTurn);
-
-    const addRestartBtn = () => {
-        const restartBtn = document.createElement('button');
-        restartBtn.textContent = 'RESTART';
-        gameMessage.appendChild(restartBtn);
-    }
-
-    return {
-        displayTurn,
-        declareWinner,
-        addRestartBtn
-    }
-})();
-
-// Factory for Player objects.
-const Player = (value, name) => {
-    // let myTurn = value === 'X' ? true : false;
-
-    const _endTurn = () => {
-        // Emit event to mediator.
-        events.emit('turnEnded', value);
-        // messages.displayTurn();
-
-        // game.checkIfWinner(value);
-    }
-
-    // const switchTurn = () => {
-    //     myTurn = !myTurn;
-    // }
-
-    // events.on('turnEnded', switchTurn);
-
-    const markSpot = spot => {
-        console.log(value + ' trying to mark...')
-        if (game.getWhoseTurn() === value) { // Check if it's your turn.
-              if (spot.textContent === '') {
-                // Change value in array.
-                gameBoard.array[spot.dataset.index] = value;
-                // Change value in DOM.
-                spot.textContent = value;
-
-                _endTurn();
-            } else {
-                alert('This spot is taken');
-            }
-        } else {
-            console.log('Not your turn, ' + value);
-        }
-    }
-
-    // // Bind to spotClicked event.
-    // events.on('spotClicked', markSpot);
-
-    return {value, name, markSpot}
-}
-
-// Set up Player variables to be defined in config.
-// This is not ideal!! Global variables.
-let playerX;
-let playerO;
-
-// Module for setting up game.
-const config = (() => {
-
-    const disableInput = (e) => {
-        const inputEl = e.target.previousElementSibling;
-        inputEl.disabled = true;
-        const btnEl = e.target;
-        btnEl.disabled = true;
-    }
-
-    const showPlayerReady = (e) => {
-        const readyP = document.createElement('p');
-        readyP.textContent = 'Player ready!';
-        readyP.classList.add('player-ready');
-
-        const parentEl = e.target.parentElement;
-        parentEl.appendChild(readyP);
-    }
-
-    const createPlayer = (e) => {
-        const name = e.target.previousElementSibling.value;
-        // Grab dataset value attribute.
-        const value =  e.target.dataset.value;
-
-        if (value === 'X') {
-            playerX = Player(value, name);
-        } else {
-            playerO = Player(value, name);
-        }
-    }
-
-    const nameBtns = document.querySelectorAll('.name-btn');
-
-    const switchToGameBoard = () => {
-        // if both name buttons are disabled
-        if (nameBtns[0].disabled && nameBtns[1].disabled) {
-            console.log('both buttons disabled.');
-            // then hide these inputs
-            const gameSetup = document.getElementById('game-setup');
-            gameSetup.style.display = 'none';
-            // and show gameboard
-            events.emit('playersReady');
-        }
-    }
-
-    nameBtns.forEach(btn => {
-        btn.addEventListener('click', disableInput);
-        btn.addEventListener('click', showPlayerReady);
-        btn.addEventListener('click', createPlayer);
-        btn.addEventListener('click', switchToGameBoard);
-    });
-
-    // Return player objects??
 })();
 
 // Render game board on page load.
