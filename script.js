@@ -115,8 +115,6 @@ const messages = (() => {
 
 // Factory for Player objects.
 const Player = (value, name) => {
-    // let myTurn = value === 'X' ? true : false;
-
     const _endTurn = () => {
         // Emit event to mediator.
         // turnEnded will trigger messages.displayTurn()
@@ -128,8 +126,8 @@ const Player = (value, name) => {
     }
 
     const markSpot = spot => {
-        console.log(value + ' trying to mark...')
-        if (game.getWhoseTurn() === value) { // Check if it's your turn.
+        console.log(name + ' trying to mark...')
+        if (game.getWhoseTurn().value === value) { // Check if it's your turn.
               if (spot.textContent === '') {
                 // Change value in array.
                 gameBoard.array[spot.dataset.index] = value;
@@ -141,7 +139,7 @@ const Player = (value, name) => {
                 alert('This spot is taken');
             }
         } else {
-            console.log('Not your turn, ' + value);
+            console.log('Not your turn, ' + name);
         }
     }
 
