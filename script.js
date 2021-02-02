@@ -81,48 +81,15 @@ const gameBoard = (() => {
     }
 })();
 
-// Module for the status messages above the game board.
-const messages = (() => {
-    const gameMessage = document.querySelector('#game-message');
-
-    const displayTurn = (value) => {
-        // Display name based on player value.
-        gameMessage.textContent = value === 'X' ? 'O\'s turn' : 'X\'s turn';
-    }
-
-    const declareWinner = (winner) => {
-        if (winner === 'tie') {
-            gameMessage.textContent = 'It\'s a tie.';
-        } else {
-            gameMessage.textContent = winner + ' wins!';
-        }
-    }
-    // Bind displayTurn to turnEnded event.
-    events.on('turnEnded', displayTurn);
-
-    const addRestartBtn = () => {
-        const restartBtn = document.createElement('button');
-        restartBtn.textContent = 'RESTART';
-        gameMessage.appendChild(restartBtn);
-    }
-
-    return {
-        displayTurn,
-        declareWinner,
-        addRestartBtn
-    }
-})();
-
 // Factory for Player objects.
 const Player = (value, name) => {
     const _endTurn = () => {
         // Emit event to mediator.
-        // turnEnded will trigger messages.displayTurn()
-        //                    and game.checkIfWinner()
+        // turnEnded will trigger:
+        //      game.setWhoseTurn()
+        //      game.checkIfWinner()
+        //      messages.displayTurn()
         events.emit('turnEnded', value);
-        // messages.displayTurn();
-
-        // game.checkIfWinner(value);
     }
 
     const markSpot = spot => {
@@ -296,6 +263,39 @@ const game = (() => {
     return {
         checkIfWinner,
         getWhoseTurn
+    }
+})();
+
+// Module for the status messages above the game board.
+const messages = (() => {
+    const gameMessage = document.querySelector('#game-message');
+
+    const displayTurn = () => {
+        // Display name based on game.getWhoseTurn()
+        gameMessage.textContent = `${game.getWhoseTurn().name}'s turn.`;
+    }
+
+    // Bind displayTurn to turnEnded event.
+    events.on('turnEnded', displayTurn);
+
+    const declareWinner = (winner) => {
+        if (winner === 'tie') {
+            gameMessage.textContent = 'It\'s a tie.';
+        } else {
+            gameMessage.textContent = winner + ' wins!';
+        }
+    }
+
+    const addRestartBtn = () => {
+        const restartBtn = document.createElement('button');
+        restartBtn.textContent = 'RESTART';
+        gameMessage.appendChild(restartBtn);
+    }
+
+    return {
+        displayTurn,
+        declareWinner,
+        addRestartBtn
     }
 })();
 
