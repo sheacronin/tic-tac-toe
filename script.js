@@ -208,6 +208,8 @@ const game = (() => {
 
     const checkIfWinner = (value) => {
         console.log('Checking if ' + value + ' is a winner...');
+        // Array to store all possible 3-in-a-row game board
+        // indexes as arrays.
         const winningConditions = [
             [0, 1, 2],
             [3, 4, 5],
@@ -221,35 +223,43 @@ const game = (() => {
             [2, 4, 6]
         ];
 
+        // Loop through each winning condition.
         for (let i = 0; i < winningConditions.length; i++) {
-            const line = winningConditions[i]; 
+            const line = winningConditions[i];
+            // Loop through each index in the winning condition.
             for (let j = 0; j < line.length; j++) {
+                // Check if that game board index matches player's value.
                 if (gameBoard.array[line[j]] === value) {
                     if (j === 2) { // All three indexes match.
                         console.log(value + ' wins!');
                         _endGame(value);
+                        // Stop the rest of the function from running
+                        // and return that there is a winner.
                         return true;
                     }
                     continue;
-                } else {
+                } else { // If the index doesn't match the player's value,
+                         // skip to next possible winning condition.
                     break;
                 }
             }
         }
 
+        // Run function to check if there's a tie if no winner has been returned.
         checkIfTie();
         console.log('No winner.');
     }
 
-
+    events.on('turnEnded', checkIfWinner);
 
     const checkIfTie = () => {
+        // Loop through every spot on the game board.
         for (let i = 0; i < gameBoard.array.length; i++) {
             if (gameBoard.array[i] === '') {
                 return false;
             }
         }
-        // If loops through all values and none are left empty:
+        // If loops through all spots and none are left empty:
         _endGame('tie');
     }
 
