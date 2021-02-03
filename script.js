@@ -241,6 +241,8 @@ const game = (() => {
         console.log('No winner.');
     }
 
+
+
     const checkIfTie = () => {
         for (let i = 0; i < gameBoard.array.length; i++) {
             if (gameBoard.array[i] === '') {
@@ -275,6 +277,8 @@ const messages = (() => {
         gameMessage.textContent = `${game.getWhoseTurn().name}'s turn.`;
     }
 
+    // Display turn initially at start of game.
+    events.on('playersReady', displayTurn);
     // Bind displayTurn to turnEnded event.
     events.on('turnEnded', displayTurn);
 
