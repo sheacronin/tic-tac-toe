@@ -74,6 +74,9 @@ const gameBoard = (() => {
         gameBoardEl.classList.add('game-over');
     }
 
+    // Trigger disableBoard when the game ends.
+    events.on('gameOver', disableBoard);
+
     return {
         array,
         render,
@@ -214,7 +217,7 @@ const game = (() => {
             for (let j = 0; j < line.length; j++) {
                 // Check if that game board index matches player's value.
                 if (gameBoard.array[line[j]] === player.value) {
-                    if (j === 2) { // All three indexes match.
+                    if (j === 2) { // All three indexes match - 3 in a row.
                         console.log(player.name + ' wins!');
                         events.emit('gameOver', player);
                         // _endGame(value);
@@ -284,7 +287,7 @@ const messages = (() => {
         if (winner === 'tie') {
             gameMessage.textContent = 'It\'s a tie.';
         } else {
-            gameMessage.textContent = winner + ' wins!';
+            gameMessage.textContent = winner.name + ' wins!';
         }
     }
 
@@ -296,6 +299,9 @@ const messages = (() => {
         restartBtn.textContent = 'RESTART';
         gameMessage.appendChild(restartBtn);
     }
+
+    // Bind addRestartBtn() to run on game over event.
+    events.on('gameOver', addRestartBtn);
 
     return {
         displayTurn,
