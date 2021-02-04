@@ -16,7 +16,6 @@ const events = {
         }
     },
     emit: function(eventName, data){
-        console.log(eventName + ' was emitted');
         if (this.events[eventName]) {
             this.events[eventName].forEach(fn => fn(data));
         }
@@ -38,17 +37,18 @@ const gameBoard = (() => {
                    '', '', ''];
 
     const displayMark = (event) => {
+        // Tell Player obj whose turn it is to mark the spot
+        // that was clicked.
         game.getWhoseTurn().markSpot(event.target);
     }
 
     const render = () => {
         let i = 0;
-        array.forEach(value => {
+        array.forEach(item => {
             const spot = document.createElement('div');
-            spot.textContent = value;
             spot.dataset.index = i;
-            // // Add listener to emit spotClicked event when spot is clicked.
-            // spot.addEventListener('click', e => events.emit('spotClicked', e.target));
+
+            // Add event listener to run display mark when clicked.
             spot.addEventListener('click', displayMark);
 
             // Check which spot to add border styles.
@@ -89,7 +89,7 @@ const Player = (value, name) => {
         //      game.setWhoseTurn()
         //      game.checkIfWinner()
         //      messages.displayTurn()
-        events.emit('turnEnded', value);
+        events.emit('turnEnded', game.getWhoseTurn());
     }
 
     const markSpot = spot => {
@@ -110,23 +110,14 @@ const Player = (value, name) => {
         }
     }
 
-    // // Bind to spotClicked event.
-    // events.on('spotClicked', markSpot);
-
     return {value, name, markSpot}
 }
-
-// // Set up Player variables to be defined in config.
-// // This is not ideal!! Global variables.
-// let playerX;
-// let playerO;
 
 // Create an empty array to store the two players.
 const players = [];
 
 // Module for setting up game.
 const config = (() => {
-
     const disableInput = (e) => {
         const inputEl = e.target.previousElementSibling;
         inputEl.disabled = true;
@@ -148,13 +139,8 @@ const config = (() => {
         // Grab dataset value attribute.
         const value =  e.target.dataset.value;
 
+        // Push new Player object into players array.
         players.push(Player(value, name));
-
-        // if (value === 'X') {
-        //     playerX = Player(value, name);
-        // } else {
-        //     playerO = Player(value, name);
-        // }
     }
 
     const nameBtns = document.querySelectorAll('.name-btn');
@@ -177,8 +163,6 @@ const config = (() => {
         btn.addEventListener('click', createPlayer);
         btn.addEventListener('click', switchToGameBoard);
     });
-
-    // Return player objects??
 })();
 
 // Module to control the flow of the game.
@@ -206,8 +190,8 @@ const game = (() => {
     // Bind to playersReady event to set init turn to player1.
     events.on('playersReady', setWhoseTurn);
 
-    const checkIfWinner = (value) => {
-        console.log('Checking if ' + value + ' is a winner...');
+    const checkIfWinner = (player) => {
+        console.log('Checking if ' + player.name + ' is a winner...');
         // Array to store all possible 3-in-a-row game board
         // indexes as arrays.
         const winningConditions = [
@@ -229,10 +213,11 @@ const game = (() => {
             // Loop through each index in the winning condition.
             for (let j = 0; j < line.length; j++) {
                 // Check if that game board index matches player's value.
-                if (gameBoard.array[line[j]] === value) {
+                if (gameBoard.array[line[j]] === player.value) {
                     if (j === 2) { // All three indexes match.
-                        console.log(value + ' wins!');
-                        _endGame(value);
+                        console.log(player.name + ' wins!');
+                        events.emit('gameOver', player);
+                        // _endGame(value);
                         // Stop the rest of the function from running
                         // and return that there is a winner.
                         return true;
@@ -260,10 +245,13 @@ const game = (() => {
             }
         }
         // If loops through all spots and none are left empty:
-        _endGame('tie');
+        // _endGame('tie');
+        events.emit('gameOver', 'tie');
     }
 
     const _endGame = (result) => {
+        // Change this to use pubsub.
+
         messages.declareWinner(result);
         // Disable board from being interacted with.
         gameBoard.disableBoard();
@@ -299,6 +287,9 @@ const messages = (() => {
             gameMessage.textContent = winner + ' wins!';
         }
     }
+
+    // Bind declareWinner() to an event.
+    events.on('gameOver', declareWinner);
 
     const addRestartBtn = () => {
         const restartBtn = document.createElement('button');
