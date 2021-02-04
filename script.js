@@ -86,15 +86,6 @@ const gameBoard = (() => {
 
 // Factory for Player objects.
 const Player = (value, name) => {
-    const _endTurn = () => {
-        // Emit event to mediator.
-        // turnEnded will trigger:
-        //      game.setWhoseTurn()
-        //      game.checkIfWinner()
-        //      messages.displayTurn()
-        events.emit('turnEnded', game.getWhoseTurn());
-    }
-
     const markSpot = spot => {
         console.log(name + ' trying to mark...')
         if (game.getWhoseTurn().value === value) { // Check if it's your turn.
@@ -104,7 +95,7 @@ const Player = (value, name) => {
                 // Change value in DOM.
                 spot.textContent = value;
 
-                _endTurn();
+                events.emit('spotMarked', game.getWhoseTurn());
             } else {
                 alert('This spot is taken');
             }
@@ -193,7 +184,7 @@ const game = (() => {
     // Bind to playersReady event to set init turn to player1.
     events.on('playersReady', setWhoseTurn);
 
-    const checkIfWinner = (player) => {
+    const checkIfWin = (player) => {
         console.log('Checking if ' + player.name + ' is a winner...');
         // Array to store all possible 3-in-a-row game board
         // indexes as arrays.
@@ -233,13 +224,17 @@ const game = (() => {
             }
         }
 
+        console.log('No winner.')
+        
         // Run function to check if there's a tie if no winner has been returned.
         checkIfTie();
-        console.log('No winner.');
+        return false;
     }
 
-    events.on('turnEnded', checkIfWinner);
+    // Bind checkIfWin to run every time a player marks a spot.
+    events.on('spotMarked', checkIfWin);
 
+    // Function runs if no winner was found in check.
     const checkIfTie = () => {
         // Loop through every spot on the game board.
         for (let i = 0; i < gameBoard.array.length; i++) {
@@ -248,23 +243,11 @@ const game = (() => {
             }
         }
         // If loops through all spots and none are left empty:
-        // _endGame('tie');
         events.emit('gameOver', 'tie');
     }
 
-    const _endGame = (result) => {
-        // Change this to use pubsub.
-
-        messages.declareWinner(result);
-        // Disable board from being interacted with.
-        gameBoard.disableBoard();
-
-        messages.addRestartBtn();
-
-    }
-
     return {
-        checkIfWinner,
+        checkIfWin,
         getWhoseTurn
     }
 })();
