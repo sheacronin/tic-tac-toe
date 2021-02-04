@@ -87,7 +87,6 @@ const gameBoard = (() => {
 // Factory for Player objects.
 const Player = (value, name) => {
     const markSpot = spot => {
-        console.log(name + ' trying to mark...')
         if (game.getWhoseTurn().value === value) { // Check if it's your turn.
               if (spot.textContent === '') {
                 // Change value in array.
@@ -142,7 +141,6 @@ const config = (() => {
     const switchToGameBoard = () => {
         // if both name buttons are disabled
         if (nameBtns[0].disabled && nameBtns[1].disabled) {
-            console.log('both buttons disabled.');
             // then hide these inputs
             const gameSetup = document.getElementById('game-setup');
             gameSetup.style.display = 'none';
@@ -185,7 +183,6 @@ const game = (() => {
     events.on('playersReady', setWhoseTurn);
 
     const checkIfWin = (player) => {
-        console.log('Checking if ' + player.name + ' is a winner...');
         // Array to store all possible 3-in-a-row game board
         // indexes as arrays.
         const winningConditions = [
@@ -223,10 +220,9 @@ const game = (() => {
                 }
             }
         }
-
-        console.log('No winner.')
         
-        // Run function to check if there's a tie if no winner has been returned.
+        // If no value returned in that loop, there is no winner.
+        // Run function to check if there's a tie.
         checkIfTie();
         return false;
     }
@@ -234,11 +230,13 @@ const game = (() => {
     // Bind checkIfWin to run every time a player marks a spot.
     events.on('spotMarked', checkIfWin);
 
-    // Function runs if no winner was found in check.
+    // Function runs if no winner was found in checkIfWin.
     const checkIfTie = () => {
         // Loop through every spot on the game board.
         for (let i = 0; i < gameBoard.array.length; i++) {
             if (gameBoard.array[i] === '') {
+                // There is an empty space, so game continues.
+                events.emit('turnEnded');
                 return false;
             }
         }
