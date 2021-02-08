@@ -151,12 +151,22 @@ const config = (() => {
     }
 
     const createPlayer = (e) => {
+        // Get name typed into input.
         const name = e.target.previousElementSibling.value;
-        // Grab dataset value attribute.
-        const value =  e.target.dataset.value;
+        // Check if no name has been input.
+        if (!name) {
+            alert('Please enter your name.');
+        } else {
+            // Grab dataset value attribute.
+            const value =  e.target.dataset.value;
 
-        // Push new Player object into players array.
-        players.push(Player(value, name));
+            // Push new Player object into players array.
+            players.push(Player(value, name));
+
+            // Run DOM functions once player has been created.
+            disableInput(e);
+            showPlayerReady(e);
+        }
     }
 
     const nameBtns = document.querySelectorAll('.name-btn');
@@ -173,8 +183,6 @@ const config = (() => {
     }
 
     nameBtns.forEach(btn => {
-        btn.addEventListener('click', disableInput);
-        btn.addEventListener('click', showPlayerReady);
         btn.addEventListener('click', createPlayer);
         btn.addEventListener('click', switchToGameBoard);
     });
@@ -197,7 +205,6 @@ const game = (() => {
         } else { // If it was player2's turn, OR if whoseTurn is empty (beginning of game).
             whoseTurn = players[0];
         }
-        console.log(whoseTurn.name + '\'s turn now');
     }
 
     // Bind to turnEnded event.
@@ -231,9 +238,7 @@ const game = (() => {
                 // Check if that game board index matches player's value.
                 if (gameBoard.array[line[j]] === player.value) {
                     if (j === 2) { // All three indexes match - 3 in a row.
-                        console.log(player.name + ' wins!');
                         events.emit('gameOver', player);
-                        // _endGame(value);
                         // Stop the rest of the function from running
                         // and return that there is a winner.
                         return true;
@@ -318,6 +323,7 @@ const messages = (() => {
     events.on('playersReady', displayStatus);
     // Bind displayTurn to turnEnded event.
     events.on('turnEnded', displayStatus);
+    // Bind to end of game.
     events.on('gameOver', displayStatus)
     // Bind to restart of game.
     events.on('restart', displayStatus);
