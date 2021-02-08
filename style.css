@@ -91,11 +91,24 @@ body {
 }
 
 #game-message {
-    margin-bottom: 20px;
+    margin: 20px auto;
+    width: 500px;
+    position: relative;
 }
 
 #game-message p {
     display: inline;
+}
+
+#restart-btn {
+    color: #f1faee;
+    background-color: #1d3557;
+    border-radius: 5px;
+    font-size: 16px;
+    padding: 5px;
+    border: none;
+    position: absolute;
+    right: 0px;
 }
 
 #game-board div {
