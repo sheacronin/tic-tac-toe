@@ -278,7 +278,7 @@ const game = (() => {
 const messages = (() => {
     const gameMessage = document.querySelector('#game-message');
 
-    const displayTurn = () => {
+    const displayStatus = (result) => {
         // Clear message element.
         gameMessage.textContent = '';
 
@@ -291,28 +291,36 @@ const messages = (() => {
         // Apend player name to message el.
         gameMessage.appendChild(playerEl);
 
+
+        // Create p element to store rest of message.
         const p = document.createElement('p');
-        p.textContent = "'s turn.";
+        
+        // Check if there is a result argument,
+        // meaning that the game has ended.
+        if (result) {
+            if (result === 'tie') {
+                // State the tie result, overriding player el.
+                gameMessage.textContent = "It's a tie.";
+                // End function b/c we do not need the p element.
+                return;
+            } else { // There is a winner of the game.
+                p.textContent = ' wins!';
+            }
+        } else { // The game is continuing.
+            p.textContent = "'s turn."
+        }
+
         // Append rest of message to message el.
         gameMessage.appendChild(p);
     }
 
     // Display turn initially at start of game.
-    events.on('playersReady', displayTurn);
+    events.on('playersReady', displayStatus);
     // Bind displayTurn to turnEnded event.
-    events.on('turnEnded', displayTurn);
+    events.on('turnEnded', displayStatus);
+    events.on('gameOver', displayStatus)
     // Bind to restart of game.
-    events.on('restart', displayTurn);
-
-    const declareWinner = (winner) => {
-        if (winner === 'tie') {
-            gameMessage.textContent = 'It\'s a tie.';
-        } else {
-            gameMessage.textContent = winner.name + ' wins!';
-        }
-    }
-
-    events.on('gameOver', declareWinner);
+    events.on('restart', displayStatus);
 
     const addRestartBtn = () => {
         const restartBtn = document.createElement('button');
