@@ -77,10 +77,20 @@ const gameBoard = (() => {
     // Trigger disableBoard when the game ends.
     events.on('gameOver', disableBoard);
 
+    const resetBoard = () => {
+        // Reset array values to empty strings.
+        for (let i = 0; i < array.length; i++) {
+            array[i] = '';
+        }
+        // Reset text content of spots to empty.
+        gameBoardEl.childNodes.forEach(spot => spot.textContent = '');
+    }
+
+    events.on('restart', resetBoard);
+
     return {
         array,
         render,
-        disableBoard
     }
 })();
 
@@ -181,6 +191,8 @@ const game = (() => {
     events.on('turnEnded', setWhoseTurn);
     // Bind to playersReady event to set init turn to player1.
     events.on('playersReady', setWhoseTurn);
+    // Bind to restart of game.
+    events.on('restart', setWhoseTurn);
 
     const checkIfWin = (player) => {
         // Array to store all possible 3-in-a-row game board
@@ -263,6 +275,8 @@ const messages = (() => {
     events.on('playersReady', displayTurn);
     // Bind displayTurn to turnEnded event.
     events.on('turnEnded', displayTurn);
+    // Bind to restart of game.
+    events.on('restart', displayTurn);
 
     const declareWinner = (winner) => {
         if (winner === 'tie') {
@@ -272,18 +286,20 @@ const messages = (() => {
         }
     }
 
-    // Bind declareWinner() to an event.
     events.on('gameOver', declareWinner);
 
     const addRestartBtn = () => {
         const restartBtn = document.createElement('button');
+        restartBtn.id = 'restart-btn';
         restartBtn.textContent = 'RESTART';
+        // Emit restart event when button is clicked.
+        restartBtn.addEventListener('click', () => events.emit('restart'));
         gameMessage.appendChild(restartBtn);
     }
 
     // Bind addRestartBtn() to run on game over event.
     events.on('gameOver', addRestartBtn);
-
+    
     return {
         displayTurn,
         declareWinner,
