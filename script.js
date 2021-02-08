@@ -82,8 +82,17 @@ const gameBoard = (() => {
         for (let i = 0; i < array.length; i++) {
             array[i] = '';
         }
-        // Reset text content of spots to empty.
-        gameBoardEl.childNodes.forEach(spot => spot.textContent = '');
+    
+        gameBoardEl.childNodes.forEach(spot => {
+            // Reset text content of spots to empty.
+            spot.textContent = '';
+            // Remove style classes to reset colors.
+            spot.classList.remove('x', 'o');
+            // Enable event listeners on the board.
+            spot.addEventListener('click', displayMark);
+        });
+        
+
     }
 
     events.on('restart', resetBoard);
@@ -105,6 +114,8 @@ const Player = (value, name) => {
                 gameBoard.array[spot.dataset.index] = value;
                 // Change value in DOM.
                 spot.textContent = value;
+                // Add class style with color.
+                spot.classList.add(value.toLowerCase());
 
                 events.emit('spotMarked', game.getWhoseTurn());
             } else {

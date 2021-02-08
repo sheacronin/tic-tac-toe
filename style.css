@@ -61,11 +61,11 @@ body {
     left: 27%;
 }
 
-#x {
+.x {
     color: #457b9d;
 }
 
-#o {
+.o {
     color: #E63946;
 }
 
