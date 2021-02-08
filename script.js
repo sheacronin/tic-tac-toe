@@ -279,8 +279,22 @@ const messages = (() => {
     const gameMessage = document.querySelector('#game-message');
 
     const displayTurn = () => {
-        // Display name based on game.getWhoseTurn()
-        gameMessage.textContent = `${game.getWhoseTurn().name}'s turn.`;
+        // Clear message element.
+        gameMessage.textContent = '';
+
+        // Create a strong element to state the player's name.
+        const player = game.getWhoseTurn();
+        const playerEl = document.createElement('strong');
+        // Style the element with player's color.
+        playerEl.classList.add(player.value.toLowerCase());
+        playerEl.textContent = player.name;
+        // Apend player name to message el.
+        gameMessage.appendChild(playerEl);
+
+        const p = document.createElement('p');
+        p.textContent = "'s turn.";
+        // Append rest of message to message el.
+        gameMessage.appendChild(p);
     }
 
     // Display turn initially at start of game.

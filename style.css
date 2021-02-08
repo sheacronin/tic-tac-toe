@@ -28,10 +28,6 @@ body {
     position: relative;
 }
 
-/* .name-label {
-
-} */
-
 .name-input {
     height: 40px;
     border: none;
@@ -95,6 +91,10 @@ body {
 
 #game-message {
     margin-bottom: 20px;
+}
+
+#game-message p {
+    display: inline;
 }
 
 #game-board div {
