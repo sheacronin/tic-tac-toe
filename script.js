@@ -88,9 +88,11 @@ const gameBoard = (() => {
 
     events.on('restart', resetBoard);
 
+    // Render game board on page load.
+    render();
+
     return {
-        array,
-        render,
+        array
     }
 })();
 
@@ -257,7 +259,6 @@ const game = (() => {
     }
 
     return {
-        checkIfWin,
         getWhoseTurn
     }
 })();
@@ -299,13 +300,4 @@ const messages = (() => {
 
     // Bind addRestartBtn() to run on game over event.
     events.on('gameOver', addRestartBtn);
-    
-    return {
-        displayTurn,
-        declareWinner,
-        addRestartBtn
-    }
 })();
-
-// Render game board on page load.
-gameBoard.render();
